@@ -1,5 +1,12 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from "sequelize";
-import { Deposit, DepositLedger, User, UserRepository } from "../core-types";
+import {
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  Sequelize,
+} from 'sequelize';
+import {Deposit, DepositLedger, User, UserRepository} from '../core-types';
 
 class UserModel extends Model<
   InferAttributes<UserModel>,

@@ -2,7 +2,7 @@ import {User} from '../../src/core-types';
 import {
   InMemoryDepositLedger,
   InMemoryUserRepository,
-} from '../../src/impl/in-memory';
+} from '../../src/impl/in-memory-repositories';
 import {createApp} from '../../src/main';
 
 export function createTestApp(initialUsers: User[] = []) {
