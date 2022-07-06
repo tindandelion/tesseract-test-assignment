@@ -1,9 +1,9 @@
-import { InMemoryDepositLedger, InMemoryUserRepository } from './impl/in-memory';
+import {InMemoryDepositLedger, InMemoryUserRepository} from './impl/in-memory';
 import {createApp} from './main';
 
-const app = createApp({ 
+const app = createApp({
   userRepository: new InMemoryUserRepository([]),
-  depositLedger: new InMemoryDepositLedger()
+  depositLedger: new InMemoryDepositLedger(),
 });
 
 app.listen(3000, () => {

@@ -1,7 +1,7 @@
 import {Express} from 'express';
 // eslint-disable-next-line node/no-unpublished-import
 import * as request from 'supertest';
-import { createTestApp } from './helpers';
+import {createTestApp} from './helpers';
 
 class BackendApi {
   private readonly request;

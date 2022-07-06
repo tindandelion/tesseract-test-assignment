@@ -2,8 +2,8 @@ import * as express from 'express';
 import {DepositLedger, UserRepository} from './core-types';
 
 type ApplicationDependencies = {
-  userRepository: UserRepository
-  depositLedger: DepositLedger
+  userRepository: UserRepository;
+  depositLedger: DepositLedger;
 };
 
 function badRequest(res: express.Response, message: string) {
@@ -11,7 +11,7 @@ function badRequest(res: express.Response, message: string) {
 }
 
 export function createApp(params: ApplicationDependencies) {
-  const { userRepository, depositLedger } = params
+  const {userRepository, depositLedger} = params;
 
   const app = express();
   app.use(express.json());
