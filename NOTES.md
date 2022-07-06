@@ -2,7 +2,7 @@
 
 ## Application structure 
 
-The main application file is located under `src/main.ts`. It contains a factory function `createApp()` that's responsible for creating the Express app and setting up all necessary request handlers. As input, the function receives references to external dependencies. In this application, I consider `UserRepository` and `DepositLedger` as external dependencies that are replaced with test versions when the application is started under tests. 
+The main application file is located under `src/app/main.ts`. It contains a factory function `createApp()` that's responsible for creating the Express app and setting up all necessary request handlers. As input, the function receives references to external dependencies. In this application, I consider `UserRepository` and `DepositLedger` as external dependencies that are replaced with test versions when the application is started under tests. 
 
 This approach shows why I decided to use `createApp()` function to launch the instance of the application inside the test suite, as opposed to the approach I was supposed to follow, where the server would be expected to run externally on port 3000: 
 
@@ -17,5 +17,15 @@ On the API side of things, I haven't done a lot of input data validations, as a 
 
 ## API tests
 
-I've found that the provided test suite in `test/index.spec.ts` wasn't sufficient to work on the proper implementation. I've left that file mostly untouched (had to make some changes though as it wasn't consistent), and created a new test suite in `test/api-tests.spec.ts`, where I created a test suite to drive the implementation; 
+I've found that the provided test suite in `test/index.spec.ts` wasn't sufficient to work on the proper implementation. I've left that file mostly untouched (had to make some changes though as it wasn't consistent), and created a new test suite in `test/api-tests.spec.ts`, where I created a test suite to drive the implementation.
+
+I've found the following problems with the default test suite: 
+
+- It's not clear why the very first deposit we create has ID == 4. I'd expect it to have the ID == 1, as it's the very first deposit. 
+- The `README.md`, `migration.csv` and the test suite are out of sync in terms of data. It's not clear which one I should have used as a source of truth. 
+- The test `05 users with balances` doesn't tell the entire story: it's not clear where the assertion data comes from. 
+
+All in all, I took the liberty to change the default test suite a little bit to make them pass. 
+
+
 
