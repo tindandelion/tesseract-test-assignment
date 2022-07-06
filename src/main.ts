@@ -26,8 +26,12 @@ class InMemoryUserRepository {
     return [...this.users];
   }
 
-  addUser(userData: Omit<User, 'id'>): User {
-    const newUser = {id: this.getNextId(), ...userData};
+  userExists(email: string) {
+    return this.users.some(u => u.email === email);
+  }
+
+  addUser(email: string): User {
+    const newUser = {id: this.getNextId(), email};
     this.users.push(newUser);
     return newUser;
   }
@@ -78,9 +82,13 @@ export function createApp(params: ApplicationParams = {}) {
   });
 
   app.post('/api/users', (req, res) => {
-    const userData = req.body;
-    const newUser = userRepository.addUser(userData);
-    res.status(201).json(newUser);
+    const {email} = req.body;
+    if (userRepository.userExists(email)) {
+      res.status(400).end();
+    } else {
+      const newUser = userRepository.addUser(email);
+      res.status(201).json(newUser);
+    }
   });
 
   app.post('/api/deposits', (req, res) => {
