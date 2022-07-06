@@ -1,79 +1,22 @@
 import * as express from 'express';
-
-type User = {
-  id: number;
-  email: string;
-};
-
-type Deposit = {
-  id: number;
-  userId: number;
-  amount: number;
-};
+import {DepositLedger, User, UserRepository} from './core-types';
+import {InMemoryDepositLedger, InMemoryUserRepository} from './impl/in-memory';
 
 type ApplicationParams = {
   initialUsers?: User[];
 };
-
-class InMemoryUserRepository {
-  private readonly users: User[];
-
-  constructor(initialUsers: User[]) {
-    this.users = [...initialUsers];
-  }
-
-  getAll(): User[] {
-    return [...this.users];
-  }
-
-  userExistsByEmail(email: string) {
-    return this.users.some(u => u.email === email);
-  }
-
-  userExistsById(userId: number) {
-    return this.users.some(u => u.id === userId);
-  }
-
-  addUser(email: string): User {
-    const newUser = {id: this.getNextId(), email};
-    this.users.push(newUser);
-    return newUser;
-  }
-
-  private getNextId() {
-    return this.users.length + 1;
-  }
-}
-
-class InMemoryDepositLedger {
-  private readonly deposits: Deposit[] = [];
-
-  deposit(userId: number, amount: number) {
-    const newDeposit = {id: this.getNextId(), userId, amount};
-    this.deposits.push(newDeposit);
-    return newDeposit;
-  }
-
-  getBalance(userId: number): number {
-    return this.deposits
-      .filter(d => d.userId === userId)
-      .reduce((acc, d) => d.amount + acc, 0);
-  }
-
-  private getNextId() {
-    return this.deposits.length + 1;
-  }
-}
 
 function badRequest(res: express.Response, message: string) {
   res.status(400).send(message);
 }
 
 export function createApp(params: ApplicationParams = {}) {
-  const app = express();
-  const userRepository = new InMemoryUserRepository(params.initialUsers || []);
-  const depositLedger = new InMemoryDepositLedger();
+  const userRepository: UserRepository = new InMemoryUserRepository(
+    params.initialUsers || []
+  );
+  const depositLedger: DepositLedger = new InMemoryDepositLedger();
 
+  const app = express();
   app.use(express.json());
 
   app.get('/api/ping', (req, res) => {
