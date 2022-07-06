@@ -1,8 +1,7 @@
 import {Express} from 'express';
 // eslint-disable-next-line node/no-unpublished-import
 import * as request from 'supertest';
-
-import {createApp} from '../src/main';
+import { createTestApp } from './helpers';
 
 class BackendApi {
   private readonly request;
@@ -50,7 +49,7 @@ describe('API tests', () => {
   let api: BackendApi;
 
   beforeEach(() => {
-    api = new BackendApi(createApp());
+    api = new BackendApi(createTestApp());
   });
 
   describe('ping request', () => {

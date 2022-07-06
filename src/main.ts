@@ -1,20 +1,17 @@
 import * as express from 'express';
-import {DepositLedger, User, UserRepository} from './core-types';
-import {InMemoryDepositLedger, InMemoryUserRepository} from './impl/in-memory';
+import {DepositLedger, UserRepository} from './core-types';
 
-type ApplicationParams = {
-  initialUsers?: User[];
+type ApplicationDependencies = {
+  userRepository: UserRepository
+  depositLedger: DepositLedger
 };
 
 function badRequest(res: express.Response, message: string) {
   res.status(400).send(message);
 }
 
-export function createApp(params: ApplicationParams = {}) {
-  const userRepository: UserRepository = new InMemoryUserRepository(
-    params.initialUsers || []
-  );
-  const depositLedger: DepositLedger = new InMemoryDepositLedger();
+export function createApp(params: ApplicationDependencies) {
+  const { userRepository, depositLedger } = params
 
   const app = express();
   app.use(express.json());

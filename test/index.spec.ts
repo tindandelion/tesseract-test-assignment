@@ -2,7 +2,7 @@ import {Express} from 'express';
 // eslint-disable-next-line node/no-unpublished-import
 import * as request from 'supertest';
 
-import {createApp} from '../src/main';
+import { createTestApp } from './helpers';
 
 function createRequest(app: Express) {
   return request(app);
@@ -23,7 +23,7 @@ describe('hello', () => {
   let app: Express;
 
   beforeEach(async () => {
-    app = createApp({initialUsers});
+    app = createTestApp(initialUsers);
   });
 
   it('should run', () => {
