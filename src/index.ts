@@ -4,7 +4,7 @@ import {
   SqlDepositLedger,
   SqlUserRepository,
 } from './impl/sql-repositories';
-import {createApp} from './main';
+import {createApp} from './app/main';
 
 async function createRepositories() {
   const sequelize = new Sequelize('sqlite::memory:', {logging: false});

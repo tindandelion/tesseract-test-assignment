@@ -1,4 +1,4 @@
-import {Deposit, DepositLedger, User, UserRepository} from '../core-types';
+import {Deposit, DepositLedger, User, UserRepository} from '../app/core-types';
 
 export class InMemoryUserRepository implements UserRepository {
   private readonly users: User[];

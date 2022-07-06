@@ -6,7 +6,7 @@ import {
   Model,
   Sequelize,
 } from 'sequelize';
-import {Deposit, DepositLedger, User, UserRepository} from '../core-types';
+import {Deposit, DepositLedger, User, UserRepository} from '../app/core-types';
 
 class UserModel extends Model<
   InferAttributes<UserModel>,
