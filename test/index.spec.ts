@@ -92,6 +92,13 @@ describe('hello', () => {
   });
 
   describe('04 add deposit', () => {
+    beforeEach(async () => {
+      await createRequest(app)
+        .post('/api/users')
+        .send({email: 'charlie@example.com'})
+        .expect(201);
+    });
+
     it('should add deposit and return it', done => {
       createRequest(app)
         .post('/api/deposits')

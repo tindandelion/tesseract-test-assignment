@@ -30,6 +30,10 @@ class InMemoryUserRepository {
     return this.users.some(u => u.email === email);
   }
 
+  userExistsById(userId: number) {
+    return this.users.some(u => u.id === userId);
+  }
+
   addUser(email: string): User {
     const newUser = {id: this.getNextId(), email};
     this.users.push(newUser);
@@ -93,8 +97,12 @@ export function createApp(params: ApplicationParams = {}) {
 
   app.post('/api/deposits', (req, res) => {
     const {userId, amount} = req.body;
-    const newDeposit = depositLedger.deposit(userId, amount);
-    res.status(201).json(newDeposit);
+    if (userRepository.userExistsById(userId)) {
+      const newDeposit = depositLedger.deposit(userId, amount);
+      res.status(201).json(newDeposit);
+    } else {
+      res.status(400).send(`User by id [${userId}] does not exist`);
+    }
   });
 
   return app;
