@@ -1,4 +1,5 @@
 import {Express} from 'express';
+import {truncateSync} from 'fs';
 // eslint-disable-next-line node/no-unpublished-import
 import * as request from 'supertest';
 
@@ -20,6 +21,12 @@ class BackendApi {
 
   addUserRequest(email: string) {
     return this.request.post('/api/users').send({email});
+  }
+
+  addUser(email: string) {
+    return this.addUserRequest(email)
+      .expect(201)
+      .then(res => res.body);
   }
 
   getUserList() {
@@ -48,10 +55,7 @@ describe('API tests', () => {
     const userEmail = 'alice@example.com';
 
     it('adds a new user by email with a zero initial balance', async () => {
-      const addedUser = await api
-        .addUserRequest(userEmail)
-        .expect(201)
-        .then(res => res.body);
+      const addedUser = await api.addUser(userEmail)
 
       const userList = await api.getUserList();
       expect(userList).toEqual([
@@ -60,9 +64,21 @@ describe('API tests', () => {
     });
 
     it('responds with Bad Request if a user with given email already exists', async () => {
-      await api.addUserRequest(userEmail).expect(201)
-      await api.addUserRequest(userEmail).expect(400)
+      await api.addUserRequest(userEmail).expect(201);
+      await api.addUserRequest(userEmail).expect(400);
     });
 
+    it('adds multiple users with different emails', async () => {
+      const anotherUserEmail = 'bob@example.com';
+
+      const {id: aliceId} = await api.addUser(userEmail);
+      const {id: bobId} = await api.addUser(anotherUserEmail);
+
+      const userList = await api.getUserList();
+      expect(userList).toEqual([
+        {id: aliceId, email: userEmail, balance: 0},
+        {id: bobId, email: anotherUserEmail, balance: 0},
+      ]);
+    });
   });
 });
