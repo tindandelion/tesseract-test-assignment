@@ -40,9 +40,7 @@ class BackendApi {
   }
 
   depositAmount(userId: number, amount: number) {
-    return this.request
-      .post('/api/deposits')
-      .send({userId, amount})
+    return this.depositAmountRequest(userId, amount)
       .expect(201)
       .then(res => res.body);
   }
@@ -119,7 +117,16 @@ describe('API tests', () => {
     });
 
     it('responds with Bad Request when the user does not exist by id', async () => {
-      await api.depositAmountRequest(userId + 100, 100).expect(400);
+      const absentUserId = 1000;
+      await api.depositAmountRequest(absentUserId, 100).expect(400);
+    });
+
+    it('responds with Bad Request when trying to withdraw more than the user has', async () => {
+      await api.depositAmount(userId, 100);
+      await api.depositAmountRequest(userId, -110).expect(400);
+
+      const userList = await api.getUserList();
+      expect(userList).toEqual([{id: userId, email: userEmail, balance: 100}]);
     });
   });
 });
