@@ -82,7 +82,10 @@ describe('hello', () => {
             id: 2,
             email: 'bob@example.com',
           },
-          {id: 3, email: 'charlie@example.com'},
+          {
+            id: 3,
+            email: 'charlie@example.com',
+          },
         ]);
     });
   });
@@ -93,7 +96,7 @@ describe('hello', () => {
         .post('/api/deposits')
         .send({userId: 3, amount: 100})
         .expect(201)
-        .expect({id: 4, userId: 3, amount: 100}, done);
+        .expect({id: 1, userId: 3, amount: 100}, done);
     });
   });
 

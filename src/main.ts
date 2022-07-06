@@ -8,7 +8,8 @@ type User = {
   id: number;
   email: string;
 };
-type NewUser = Omit<User, 'id'>;
+
+type Deposit = any;
 
 class InMemoryUserRepository {
   private readonly users: User[];
@@ -21,7 +22,7 @@ class InMemoryUserRepository {
     return [...this.users];
   }
 
-  addUser(userData: NewUser): User {
+  addUser(userData: Omit<User, 'id'>): User {
     const newUser = {id: this.getNextId(), ...userData};
     this.users.push(newUser);
     return newUser;
@@ -32,9 +33,24 @@ class InMemoryUserRepository {
   }
 }
 
+class InMemoryDepositRepository {
+  private readonly deposits: Deposit[] = [];
+
+  deposit(userId: any, amount: any) {
+    const newDeposit = {id: this.getNextId(), userId, amount};
+    this.deposits.push(newDeposit);
+    return newDeposit;
+  }
+
+  private getNextId() {
+    return this.deposits.length + 1;
+  }
+}
+
 export function createApp(params: ApplicationParams = {}) {
   const app = express();
   const userRepository = new InMemoryUserRepository(params.initialUsers || []);
+  const depositRepository = new InMemoryDepositRepository();
 
   app.use(express.json());
   app.get('/api/ping', (req, res) => {
@@ -49,7 +65,9 @@ export function createApp(params: ApplicationParams = {}) {
     res.status(201).json(newUser);
   });
   app.post('/api/deposits', (req, res) => {
-    res.status(201).end();
+    const {userId, amount} = req.body;
+    const newDeposit = depositRepository.deposit(userId, amount);
+    res.status(201).json(newDeposit);
   });
 
   return app;
