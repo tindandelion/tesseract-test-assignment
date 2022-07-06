@@ -19,11 +19,11 @@ export function createApp(params: ApplicationParams = {}) {
   const app = express();
   app.use(express.json());
 
-  app.get('/api/ping', (req, res) => {
+  app.get('/api/ping', (_req, res) => {
     res.send('pong');
   });
 
-  app.get('/api/users', (req, res) => {
+  app.get('/api/users', (_req, res) => {
     const allUsers = userRepository.getAll();
     const response = allUsers.map(u => ({
       ...u,
