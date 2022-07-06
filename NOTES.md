@@ -15,6 +15,8 @@ For production use, I implemented SQL-backed versions of external dependencies, 
 
 On the API side of things, I haven't done a lot of input data validations, as a real production application would require. Mainly, I skipped them due to time constraints. We have a few validations to ensure the data integrity, though. 
 
+Architecture-wise, right now most of the business logic resides in the Express request handlers. In my opinion, this is fine for a simple application like this. The testability does not suffer, since the code is quite easily testable via the HTTP requests. However, in real-world applications it's not desirable to have such strong coupling between the application logic and the delivery framework. As a future improvement, I would extract the application logic into a Service Facade class, leaving in the request handlers only the input parsing and validation. Such decoupling makes it easier to upgrade Express to future versions, or even migrate to a different Web framework entirely. 
+
 ## API tests
 
 I've found that the provided test suite in `test/index.spec.ts` wasn't sufficient to work on the proper implementation. I've left that file mostly untouched (had to make some changes though as it wasn't consistent), and created a new test suite in `test/api-tests.spec.ts`, where I created a test suite to drive the implementation.
