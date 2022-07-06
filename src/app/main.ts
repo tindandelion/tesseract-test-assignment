@@ -2,11 +2,6 @@ import * as express from 'express';
 import {DepositLedger, UserRepository} from './core-types';
 import asyncHandler = require('express-async-handler');
 
-type ApplicationDependencies = {
-  userRepository: UserRepository;
-  depositLedger: DepositLedger;
-};
-
 function badRequest(res: express.Response, message: string) {
   res.status(400).send(message);
 }
@@ -60,6 +55,11 @@ function depositAmount(userRepo: UserRepository, depositLedger: DepositLedger) {
     }
   });
 }
+
+export type ApplicationDependencies = {
+  userRepository: UserRepository;
+  depositLedger: DepositLedger;
+};
 
 export function createApp(params: ApplicationDependencies) {
   const {userRepository, depositLedger} = params;
