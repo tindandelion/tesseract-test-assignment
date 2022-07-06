@@ -1,15 +1,19 @@
-import express = require('express');
-
-type ApplicationParams = {
-  initialUsers?: any[];
-};
+import * as express from 'express';
 
 type User = {
   id: number;
   email: string;
 };
 
-type Deposit = any;
+type Deposit = {
+  id: number;
+  userId: number;
+  amount: number;
+};
+
+type ApplicationParams = {
+  initialUsers?: User[];
+};
 
 class InMemoryUserRepository {
   private readonly users: User[];
@@ -33,13 +37,19 @@ class InMemoryUserRepository {
   }
 }
 
-class InMemoryDepositRepository {
+class InMemoryDepositLedger {
   private readonly deposits: Deposit[] = [];
 
-  deposit(userId: any, amount: any) {
+  deposit(userId: number, amount: number) {
     const newDeposit = {id: this.getNextId(), userId, amount};
     this.deposits.push(newDeposit);
     return newDeposit;
+  }
+
+  getBalance(userId: number): number {
+    return this.deposits
+      .filter(d => d.userId === userId)
+      .reduce((acc, d) => d.amount + acc, 0);
   }
 
   private getNextId() {
@@ -50,23 +60,32 @@ class InMemoryDepositRepository {
 export function createApp(params: ApplicationParams = {}) {
   const app = express();
   const userRepository = new InMemoryUserRepository(params.initialUsers || []);
-  const depositRepository = new InMemoryDepositRepository();
+  const depositLedger = new InMemoryDepositLedger();
 
   app.use(express.json());
+
   app.get('/api/ping', (req, res) => {
     res.send('pong');
   });
+
   app.get('/api/users', (req, res) => {
-    res.json(userRepository.getAll());
+    const allUsers = userRepository.getAll();
+    const response = allUsers.map(u => ({
+      ...u,
+      balance: depositLedger.getBalance(u.id),
+    }));
+    res.json(response);
   });
+
   app.post('/api/users', (req, res) => {
     const userData = req.body;
     const newUser = userRepository.addUser(userData);
     res.status(201).json(newUser);
   });
+
   app.post('/api/deposits', (req, res) => {
     const {userId, amount} = req.body;
-    const newDeposit = depositRepository.deposit(userId, amount);
+    const newDeposit = depositLedger.deposit(userId, amount);
     res.status(201).json(newDeposit);
   });
 

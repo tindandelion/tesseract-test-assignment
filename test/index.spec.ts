@@ -1,14 +1,10 @@
-// eslint-disable-next-line node/no-unpublished-import
 import {Express} from 'express';
+// eslint-disable-next-line node/no-unpublished-import
 import * as request from 'supertest';
 
 import {createApp} from '../src/main';
 
-function createRequest() {
-  return request('http://localhost:3000/api');
-}
-
-function createRequest2(app: Express) {
+function createRequest(app: Express) {
   return request(app);
 }
 
@@ -36,13 +32,13 @@ describe('hello', () => {
 
   describe('01 ping', () => {
     it('should return pong', done => {
-      createRequest2(app).get('/api/ping').expect(200).expect('pong', done);
+      createRequest(app).get('/api/ping').expect(200).expect('pong', done);
     });
   });
 
   describe('02 list users', () => {
     it('should return users', done => {
-      createRequest2(app)
+      createRequest(app)
         .get('/api/users')
         .expect(200)
         .expect(
@@ -50,10 +46,12 @@ describe('hello', () => {
             {
               id: 1,
               email: 'alice@example.com',
+              balance: 0,
             },
             {
               id: 2,
               email: 'bob@example.com',
+              balance: 0,
             },
           ],
           done
@@ -63,13 +61,13 @@ describe('hello', () => {
 
   describe('03 add user', () => {
     it('should add user and return it', async () => {
-      await createRequest2(app)
+      await createRequest(app)
         .post('/api/users')
         .send({email: 'charlie@example.com'})
         .expect(201)
         .expect({id: 3, email: 'charlie@example.com'});
 
-      await createRequest2(app)
+      await createRequest(app)
         .get('/api/users')
         .send({email: 'charlie@example.com'})
         .expect(200)
@@ -77,14 +75,17 @@ describe('hello', () => {
           {
             id: 1,
             email: 'alice@example.com',
+            balance: 0,
           },
           {
             id: 2,
             email: 'bob@example.com',
+            balance: 0,
           },
           {
             id: 3,
             email: 'charlie@example.com',
+            balance: 0,
           },
         ]);
     });
@@ -92,7 +93,7 @@ describe('hello', () => {
 
   describe('04 add deposit', () => {
     it('should add deposit and return it', done => {
-      createRequest2(app)
+      createRequest(app)
         .post('/api/deposits')
         .send({userId: 3, amount: 100})
         .expect(201)
@@ -100,10 +101,37 @@ describe('hello', () => {
     });
   });
 
-  xdescribe('05 users with balances', () => {
+  describe('05 users with balances', () => {
+    beforeEach(async () => {
+      await createRequest(app)
+        .post('/api/users')
+        .send({email: 'charlie@example.com'})
+        .expect(201);
+
+      await createRequest(app)
+        .post('/api/deposits')
+        .send({userId: 1, amount: 100})
+        .expect(201);
+
+      await createRequest(app)
+        .post('/api/deposits')
+        .send({userId: 2, amount: 75})
+        .expect(201);
+
+      await createRequest(app)
+        .post('/api/deposits')
+        .send({userId: 3, amount: 100})
+        .expect(201);
+
+      await createRequest(app)
+        .post('/api/deposits')
+        .send({userId: 1, amount: -50})
+        .expect(201);
+    });
+
     it('should return all users with balances', done => {
-      createRequest()
-        .get('/users')
+      createRequest(app)
+        .get('/api/users')
         .expect(200)
         .expect(
           [
