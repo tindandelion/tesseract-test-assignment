@@ -10,13 +10,13 @@ export type Deposit = {
 };
 
 export interface UserRepository {
-  getAll(): User[];
-  userExistsByEmail(email: string): boolean;
-  userExistsById(userId: number): boolean;
-  addUser(email: string): User;
+  getAll(): Promise<User[]>;
+  userExistsByEmail(email: string): Promise<boolean>;
+  userExistsById(userId: number): Promise<boolean>;
+  addUser(email: string): Promise<User>;
 }
 
 export interface DepositLedger {
-  getBalance(userId: number): number;
-  deposit(userId: number, amount: number): Deposit;
+  getBalance(userId: number): Promise<number>;
+  deposit(userId: number, amount: number): Promise<Deposit>;
 }

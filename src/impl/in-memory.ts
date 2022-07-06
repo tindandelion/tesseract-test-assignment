@@ -7,19 +7,19 @@ export class InMemoryUserRepository implements UserRepository {
     this.users = [...initialUsers];
   }
 
-  getAll(): User[] {
+  async getAll(): Promise<User[]> {
     return [...this.users];
   }
 
-  userExistsByEmail(email: string) {
+  async userExistsByEmail(email: string) {
     return this.users.some(u => u.email === email);
   }
 
-  userExistsById(userId: number) {
+  async userExistsById(userId: number) {
     return this.users.some(u => u.id === userId);
   }
 
-  addUser(email: string): User {
+  async addUser(email: string): Promise<User> {
     const newUser = {id: this.getNextId(), email};
     this.users.push(newUser);
     return newUser;
@@ -33,13 +33,13 @@ export class InMemoryUserRepository implements UserRepository {
 export class InMemoryDepositLedger implements DepositLedger {
   private readonly deposits: Deposit[] = [];
 
-  deposit(userId: number, amount: number) {
+  async deposit(userId: number, amount: number) {
     const newDeposit = {id: this.getNextId(), userId, amount};
     this.deposits.push(newDeposit);
     return newDeposit;
   }
 
-  getBalance(userId: number): number {
+  async getBalance(userId: number): Promise<number> {
     return this.deposits
       .filter(d => d.userId === userId)
       .reduce((acc, d) => d.amount + acc, 0);

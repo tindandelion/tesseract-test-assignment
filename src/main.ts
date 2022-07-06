@@ -24,11 +24,13 @@ export function createApp(params: ApplicationDependencies) {
   app.get(
     '/api/users',
     asyncHandler(async (_req, res) => {
-      const allUsers = userRepository.getAll();
-      const response = allUsers.map(u => ({
-        ...u,
-        balance: depositLedger.getBalance(u.id),
-      }));
+      const allUsers = await userRepository.getAll();
+      const response = await Promise.all(
+        allUsers.map(async u => ({
+          ...u,
+          balance: await depositLedger.getBalance(u.id),
+        }))
+      );
       res.json(response);
     })
   );
@@ -37,10 +39,10 @@ export function createApp(params: ApplicationDependencies) {
     '/api/users',
     asyncHandler(async (req, res) => {
       const {email} = req.body;
-      if (userRepository.userExistsByEmail(email)) {
+      if (await userRepository.userExistsByEmail(email)) {
         badRequest(res, `User with email [${email}] already exists`);
       } else {
-        const newUser = userRepository.addUser(email);
+        const newUser = await userRepository.addUser(email);
         res.status(201).json(newUser);
       }
     })
@@ -50,16 +52,20 @@ export function createApp(params: ApplicationDependencies) {
     '/api/deposits',
     asyncHandler(async (req, res) => {
       const {userId, amount} = req.body;
-      if (!userRepository.userExistsById(userId)) {
+      const userExists = await userRepository.userExistsById(userId);
+      if (!userExists) {
         badRequest(res, `User by id [${userId}] does not exist`);
-      } else if (depositLedger.getBalance(userId) + amount < 0) {
-        badRequest(
-          res,
-          `Too big of amount to withdraw: [${amount}] from user by id: [${userId}]`
-        );
       } else {
-        const newDeposit = depositLedger.deposit(userId, amount);
-        res.status(201).json(newDeposit);
+        const balance = await depositLedger.getBalance(userId);
+        if (balance + amount < 0) {
+          badRequest(
+            res,
+            `Too big of amount to withdraw: [${amount}] from user by id: [${userId}]`
+          );
+        } else {
+          const newDeposit = await depositLedger.deposit(userId, amount);
+          res.status(201).json(newDeposit);
+        }
       }
     })
   );
